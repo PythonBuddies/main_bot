@@ -1,6 +1,6 @@
 from discord.ext import commands
 
-from .utils import checks, scraper
+from .utils import checks, scraper, wattpadscraper
 
 class RedditScraper:
 
@@ -33,7 +33,19 @@ class RedditScraper:
                 await self.bot.say('Category must be valid: ' + ', '.join(scraper.categories))
         else:
             await self.bot.pm_help(ctx)
+class WattpadScraper:
+    def __init__(self, bot:commands.Bot):
+        self.bot = bot
 
+    @commands.group(name ='wattpad',pass_context = True)
+    @checks.is_owner()
+    async def _wattpad(self,ctx):
+
+    @_wattpad.command(pass_context=True,name = 'fetch')
+    async def fetch(self, ctx: commands.Context):
+        result = await wattpadscraper.get_random_story_info(self.bot.session)
+        await self.bot.say(result)
 
 def setup(bot):
     bot.add_cog(RedditScraper(bot))
+    bot.add_cog(WattpadScraper(bot))
