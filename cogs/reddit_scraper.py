@@ -45,7 +45,7 @@ class WattpadScraper:
             await self.bot.pm_help(ctx)
 
     @_wattpad.command(pass_context=True, name='fetch')
-    async def fetch(self, ctx: commands.Context):
+    async def fetch(self):
         result = await wattpadscraper.get_random_story_info(self.bot.session)
         await self.bot.say(result)
 

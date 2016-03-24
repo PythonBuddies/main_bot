@@ -25,9 +25,9 @@ async def get_random_story_info(session):
         storyjson = session.get(API_NEWSTORYLIST).json()['stories'][0]
         story_title = storyjson['title']
         story_description = storyjson['description']
-        story_id = storyjson['id']
+        #story_id = storyjson['id']
         story_chapteroneurl = storyjson['parts'][0]['url']
-        story_chapteroneid = storyjson['parts'][0]['id']
+        #story_chapteroneid = storyjson['parts'][0]['id']
 
     except KeyError:
         return ['Posts could not be loaded, are you sure thats a subreddit?']
