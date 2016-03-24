@@ -34,17 +34,17 @@ class RedditScraper:
         else:
             await self.bot.pm_help(ctx)
 class WattpadScraper:
-    def __init__(self, bot:commands.Bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.group(name ='wattpad',pass_context = True)
+    @commands.group(name='wattpad', pass_context=True)
     @checks.is_owner()
-    async def _wattpad(self,ctx):
+    async def _wattpad(self, ctx):
         #gets you a random story
         if ctx.invoked_subcommand is None:
             await self.bot.pm_help(ctx)
 
-    @_wattpad.command(pass_context=True,name = 'fetch')
+    @_wattpad.command(pass_context=True, name='fetch')
     async def fetch(self, ctx: commands.Context):
         result = await wattpadscraper.get_random_story_info(self.bot.session)
         await self.bot.say(result)
