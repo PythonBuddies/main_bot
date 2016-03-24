@@ -49,3 +49,4 @@ class WattpadScraper:
 def setup(bot):
     bot.add_cog(RedditScraper(bot))
     bot.add_cog(WattpadScraper(bot))
+
