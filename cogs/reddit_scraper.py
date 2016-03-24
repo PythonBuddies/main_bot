@@ -40,6 +40,9 @@ class WattpadScraper:
     @commands.group(name ='wattpad',pass_context = True)
     @checks.is_owner()
     async def _wattpad(self,ctx):
+        #gets you a random story
+        if ctx.invoked_subcommand is None:
+            await self.bot.pm_help(ctx)
 
     @_wattpad.command(pass_context=True,name = 'fetch')
     async def fetch(self, ctx: commands.Context):
