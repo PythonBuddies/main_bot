@@ -1,6 +1,7 @@
+from random import choice
 from discord.ext import commands
 from chatterbot import ChatBot
-from random import choice
+
 
 
 # Chat cog
