@@ -1,4 +1,7 @@
 import random
+from datetime import datetime
+from pytz import timezone
+from tzlocal import get_localzone
 from discord.ext import commands
 from chatterbot import ChatBot
 from translate import Translator
@@ -101,9 +104,28 @@ class Chat:
         elif choice == 'R':
             authors = []
             authors = wikiquote.random_titles(max_titles=5)
-            random_author = random.choice(authors)
-            await self.bot.say("'" + random.choice(wikiquote.quotes(random_author)) + "'")
+            if authors == []:
+                authors = ['Dune', 'Johannes Kepler', 'Rosa Parks']
+                random_author = random.choice(authors)
+                await self.bot.say("'" + random.choice(wikiquote.quotes(random_author)) + "'")
+            else:
+                random_author = random.choice(authors)
+                await self.bot.say("'" + random.choice(wikiquote.quotes(random_author)) + "'")
 
+    @commands.command()
+    async def time(self, t_z):
+        """Command that returns current time and time in the timezone listed
+
+        **Dependencies**: pip install pytz tzlocal
+
+        **Keyword arguments**:
+        t_z  -- timezone
+        """
+        local = get_localzone()
+        local_time = datetime.now(local)
+        required_timezone = timezone(t_z)
+        converted_time = datetime.now(required_timezone)
+        await self.bot.say("```Local time : {} \n\n   {}     : {}```".format(local_time, t_z, converted_time))
 
 def setup(bot):
     bot.add_cog(Chat(bot))
