@@ -8,14 +8,12 @@ class RedditPics:
 
     def __init__(self, bot):
         self.bot = bot
-        self.post = None
-        self.random_post = None
         self.is_nsfw = False
 
     @commands.command(hidden=True)
     async def sub(self, *message):
         if len(message) == 0:
-            await self.bot.say("Help file goes here.")
+            await self.bot.say("Usage: sub r/<subreddit name>")
             return
         elif len(message) > 1:
             await self.bot.say("Too many parameters.")
@@ -24,25 +22,18 @@ class RedditPics:
             subreddit = message[0][message[0].rindex("/")+1:].strip()
             await self.bot.say("Looking up info for {}".format(subreddit))
 
-            # do stuff
-
             post = self.parse_results(subreddit)
-            print(post)
-            print(post['data']['over_18'])
-            self.is_nsfw = post['data']['over_18']
-            while self.is_nsfw:
-                print("nsfw found")
-                post = self.parse_results(subreddit)
-                self.is_nsfw = post['data']['over_18']
 
-            # reddit_results = self.get_reddit_top(subreddit)
-            # print(len(reddit_results))
-            #
-            # random_post = self.get_random_post(reddit_results)
-            #
-            # post = random_post['data']['url']
-            #
-            # print(post)
+            if post == -1:
+                await self.bot.say("No results found.")
+                return
+
+            self.is_nsfw = post['data']['over_18']
+
+            if self.is_nsfw:
+                await self.bot.say("NSFW content found, exiting.")
+                return
+
             await self.bot.say(post['data']['url'])
             return
         else:
@@ -52,13 +43,11 @@ class RedditPics:
     def parse_results(self, subreddit: str):
         reddit_results = self.get_reddit_top(subreddit)
 
-        print(len(reddit_results))
+        if len(reddit_results) == 0:
+            self.bot.say("No results found.")
+            return -1
 
-        post = self.get_random_post(reddit_results)
-
-        #post = random_post['data']['url']
-
-        return post
+        return self.get_random_post(reddit_results)
 
     def get_reddit_top(self, subreddit):
         url = "https://www.reddit.com/r/{0}/top/.json?sort=top&t=all".format(subreddit)
@@ -68,21 +57,13 @@ class RedditPics:
         reddit_reply = client.get(url, headers=header)
         return reddit_reply.json()['data']['children']
 
-    # not working yet, returns a random post
     def get_random_post(self,random_post: list):
         return random.choice(random_post)
-
-
-
-
-
 
     async def receive_message(self, message):
         if message.author.id == self.bot.user.id:
             return
 
 def setup(bot):
-    redditpics = RedditPics(bot)
-    bot.add_listener(redditpics.receive_message, "on_message")
     bot.add_cog(RedditPics(bot))
 
