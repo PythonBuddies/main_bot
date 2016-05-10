@@ -1,7 +1,7 @@
 __author__ = 'pico'
 
 from discord.ext import commands
-import requests, random, json
+import requests, random, json, aiohttp
 
 # reddit pics cog
 class RedditPics:
@@ -19,11 +19,16 @@ class RedditPics:
             return
         elif message[0].startswith("r/") or message[0].startswith("/r/"):
             subreddit = message[0][message[0].rindex("/")+1:].strip()
-            await self.bot.say("Looking up info for {}".format(subreddit))
+            self.bot.say("Looking up info for {}".format(subreddit))
 
             # do stuff
             full_json_top = self.get_reddit_top(subreddit)
-            print(full_json_top)
+            # if len(reddit_reply['data']['children']) == 0:
+            #     self.bot.say("No posts found.")
+            # else:
+            #print(type(reddit_reply))
+
+            print("full data:\n" + str(full_json_top))
             #print(self.get_random_post(full_json_top))
 
         else:
@@ -31,21 +36,22 @@ class RedditPics:
             return
 
 
-    async def get_reddit_top(self, subreddit):
+    def get_reddit_top(self, subreddit):
         url = "https://www.reddit.com/r/{0}/top/.json".format(subreddit)
         client = requests.session()
         client.get(url)
-        reddit_reply = await client.post(url)
-        if len(reddit_reply['data']['children']) == 0:
-            self.bot.say("No posts found.")
-        else:
-            return reddit_reply.text
+        header = { 'User-Agent' : 'trying to learn this async thing' }
+        reddit_reply = client.get(url, headers=header)
+        return reddit_reply.json()
 
-    def get_random_post(self,reddit_reply: json):
-        return random.choice(reddit_reply['data']['children'])
+        # print("reply: {0}".format(reddit_reply.status_code))
+        # print(reddit_reply)
+        # print("returning data")
+        # return reddit_reply
 
-
-
+    # not working yet, returns a random post
+    async def get_random_post(self,reddit_reply: json):
+        return await random.choice(reddit_reply['data']['children'])
 
 
 
