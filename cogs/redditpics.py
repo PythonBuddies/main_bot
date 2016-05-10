@@ -1,13 +1,14 @@
 __author__ = 'pico'
 
 from discord.ext import commands
-import requests, random, json, aiohttp
+import requests, random, json, asyncio
 
 # reddit pics cog
 class RedditPics:
 
     def __init__(self, bot):
         self.bot = bot
+        self.loop = asyncio.get_event_loop()
 
     @commands.command(hidden=True)
     async def sub(self, *message):
@@ -22,14 +23,11 @@ class RedditPics:
             self.bot.say("Looking up info for {}".format(subreddit))
 
             # do stuff
-            full_json_top = self.get_reddit_top(subreddit)
-            # if len(reddit_reply['data']['children']) == 0:
-            #     self.bot.say("No posts found.")
-            # else:
-            #print(type(reddit_reply))
+            self.get_reddit_top(subreddit)
+            self.get_random_post(self.reddit_reply['data']['children'])
 
-            print("full data:\n" + str(full_json_top))
-            #print(self.get_random_post(full_json_top))
+            await self.bot.say(self.random_post['data']['url'])
+            return
 
         else:
             await self.bot.say("Invalid syntax.")
@@ -42,16 +40,11 @@ class RedditPics:
         client.get(url)
         header = { 'User-Agent' : 'trying to learn this async thing' }
         reddit_reply = client.get(url, headers=header)
-        return reddit_reply.json()
-
-        # print("reply: {0}".format(reddit_reply.status_code))
-        # print(reddit_reply)
-        # print("returning data")
-        # return reddit_reply
+        self.reddit_reply =  reddit_reply.json()
 
     # not working yet, returns a random post
-    async def get_random_post(self,reddit_reply: json):
-        return await random.choice(reddit_reply['data']['children'])
+    def get_random_post(self,random_post: list):
+        self.random_post = random.choice(random_post)
 
 
 
