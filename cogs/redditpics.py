@@ -22,18 +22,22 @@ class RedditPics:
             subreddit = message[0][message[0].rindex("/")+1:].strip()
             await self.bot.say("Looking up info for {}".format(subreddit))
 
+            # everything below this line is ugly, need to learn why I'm getting coroutine errors
+            # when defining a function as async
             post = self.parse_results(subreddit)
 
+            # workaround to get the bot to output result from search if no queries found
             if post == -1:
                 await self.bot.say("No results found.")
                 return
 
+            # check for NSFW content, quit the search if found
             self.is_nsfw = post['data']['over_18']
-
             if self.is_nsfw:
                 await self.bot.say("NSFW content found, exiting.")
                 return
 
+            # this is where the bot replies with what she found
             await self.bot.say(post['data']['url'])
             return
         else:
@@ -49,6 +53,7 @@ class RedditPics:
 
         return self.get_random_post(reddit_results)
 
+    # connect to reddit and download the top posts of all time for that subreddit (limit 25)
     def get_reddit_top(self, subreddit):
         url = "https://www.reddit.com/r/{0}/top/.json?sort=top&t=all".format(subreddit)
         client = requests.session()
