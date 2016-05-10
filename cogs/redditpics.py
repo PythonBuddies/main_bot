@@ -28,7 +28,6 @@ class RedditPics:
 
             await self.bot.say(self.random_post['data']['url'])
             return
-
         else:
             await self.bot.say("Invalid syntax.")
             return
