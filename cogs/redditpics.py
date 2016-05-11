@@ -20,38 +20,39 @@ class RedditPics:
             return
         elif message[0].startswith("r/") or message[0].startswith("/r/"):
             subreddit = message[0][message[0].rindex("/")+1:].strip()
-            await self.bot.say("Looking up info for {}".format(subreddit))
-
-            # everything below this line is ugly, need to learn why I'm getting coroutine errors
-            # when defining a function as async
-            post = self.parse_results(subreddit)
-
-            # workaround to get the bot to output result from search if no queries found
-            if post == -1:
-                await self.bot.say("No results found.")
-                return
-
-            # check for NSFW content, quit the search if found
-            self.is_nsfw = post['data']['over_18']
-            if self.is_nsfw:
-                await self.bot.say("NSFW content found, exiting.")
-                return
-
-            # this is where the bot replies with what she found
-            await self.bot.say(post['data']['url'])
+            await self.execute_request(subreddit)
             return
         else:
             await self.bot.say("Invalid syntax.")
             return
 
-    def parse_results(self, subreddit: str):
+    async def execute_request(self, subreddit):
+
+        # download top reddit images for a given subreddit
         reddit_results = self.get_reddit_top(subreddit)
 
-        if len(reddit_results) == 0:
-            self.bot.say("No results found.")
-            return -1
+        # randomly pick a post from the above results
+        post = self.get_random_post(reddit_results)
 
-        return self.get_random_post(reddit_results)
+        # if no posts are found, exit
+        if len(reddit_results) == 0:
+            await self.bot.say("No results found.")
+            return
+
+        # if no images were found in the results, exit
+        if post == None:
+            await self.bot.say("No image results found.")
+            return
+
+        # check for NSFW content, exit the search if found
+        self.is_nsfw = post['data']['over_18']
+        if self.is_nsfw:
+            await self.bot.say("NSFW content found, exiting.")
+            return
+
+        # this is where the bot replies with what she found
+        await self.bot.say(post['data']['url'])
+
 
     # connect to reddit and download the top posts of all time for that subreddit (limit 25)
     def get_reddit_top(self, subreddit):
@@ -60,14 +61,24 @@ class RedditPics:
         client.get(url)
         header = { 'User-Agent' : 'trying to learn this async thing' }
         reddit_reply = client.get(url, headers=header)
+
         return reddit_reply.json()['data']['children']
 
-    def get_random_post(self,random_post: list):
-        return random.choice(random_post)
+    # pick a random post from the results, ensure that post is an image
+    # if not an image, cycle through the posts
+    def get_random_post(self, reddit_results: list):
+        # randomize a list of numbers the length of the reddit results download
+        # used to randomly cycle through the results
+        iteration = random.sample(range(0, len(reddit_results)), len(reddit_results))
 
-    async def receive_message(self, message):
-        if message.author.id == self.bot.user.id:
-            return
+        while len(iteration) is not 0:
+            result = reddit_results[iteration.pop()]
+            if "imgur" not in result['data']['url']:
+                continue
+            else:
+                return result
+        self.bot.say("Could not retrieve any picture from the results.")
+        return None
 
 def setup(bot):
     bot.add_cog(RedditPics(bot))
