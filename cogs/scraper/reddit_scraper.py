@@ -7,7 +7,7 @@ class RedditScraper(GeneralScraper):
 
     def __init__(self, bot: commands.Bot):
         super().__init__()
-        self.categories = ['hot', 'new', 'controversial', 'rising', 'top']
+        #self.categories = ['hot', 'new', 'controversial', 'rising', 'top']
         self.bot = bot
 
     @commands.group(name='reddit', pass_context=True)
