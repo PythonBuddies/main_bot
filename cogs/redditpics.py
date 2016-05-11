@@ -1,7 +1,7 @@
 __author__ = 'pico'
 
 from discord.ext import commands
-import requests, random, json, asyncio
+import requests, random
 
 # reddit pics cog
 class RedditPics:
