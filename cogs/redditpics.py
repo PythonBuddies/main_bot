@@ -28,7 +28,7 @@ class RedditPics:
     # display url to channel
     async def execute_request(self, subreddit):
         # download top reddit images for a given subreddit
-        reddit_results = await self.fetch(self.session, subreddit)
+        reddit_results = await self.fetch(subreddit)
         reddit_results = reddit_results['data']['children']
 
         # if no posts are found, exit
@@ -47,12 +47,12 @@ class RedditPics:
 
     # connect to reddit and download the top posts of all time for that subreddit (limit 25)
     # TODO make this function download multiple pages of 25 posts for better result variety
-    async def fetch(self, session, subreddit):
+    async def fetch(self, subreddit):
         header = {'User-Agent': 'trying to learn this async thing'}
         url = "https://www.reddit.com/r/{0}/top/.json?sort=top&t=all".format(subreddit)
 
         with aiohttp.Timeout(10):
-            async with session.get(url, headers=header) as response:
+            async with self.session.get(url, headers=header) as response:
                 return await response.json()
 
     # pick a random post from the results
