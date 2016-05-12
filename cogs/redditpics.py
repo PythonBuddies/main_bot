@@ -21,7 +21,7 @@ class RedditPics:
             subreddit = message[0][message[0].rindex("/")+1:].strip()
             await self.execute_request(subreddit)
         else:
-            await self.bot.say("Invalid syntax.")
+            await self.bot.say("Invalid syntax. Usage: sub r/<subreddit name>")
 
     # download subreddit top results
     # pick a random post
