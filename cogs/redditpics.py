@@ -62,9 +62,7 @@ class RedditPics:
         picture_list = []
 
         for item in reddit_results:
-            if "imgur" in item['data']['url']:
-                if item['data']['over_18']:
-                    continue
+            if "imgur" in item['data']['url'] and not item['data']['over_18']:
                 picture_list.append(item['data']['url'])
 
         try:
@@ -75,4 +73,3 @@ class RedditPics:
 
 def setup(bot):
     bot.add_cog(RedditPics(bot))
-
