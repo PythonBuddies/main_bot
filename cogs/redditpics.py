@@ -1,11 +1,14 @@
-__author__ = 'pico'
+"""Module adds discord bot ability to randomly pick a top rated image from
+a user-specified subreddit and outputs the url to the chat room."""
 
-from discord.ext import commands
 import random
+from discord.ext import commands
 import aiohttp
 
-# reddit pics cog
+
 class RedditPics:
+    """Reddit pics cog. Fetches random top post from a user-specified subreddit.
+    Must be an image."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -13,6 +16,7 @@ class RedditPics:
 
     @commands.command(hidden=True)
     async def sub(self, *message):
+        """Executed when bot is triggered. Accepts r/<subreddit> as an argument."""
         if len(message) == 0:
             await self.bot.say("Usage: sub r/<subreddit name>")
         elif len(message) > 1:
@@ -23,10 +27,8 @@ class RedditPics:
         else:
             await self.bot.say("Invalid syntax. Usage: sub r/<subreddit name>")
 
-    # download subreddit top results
-    # pick a random post
-    # display url to channel
     async def execute_request(self, subreddit):
+        """download subreddit top results, pick a random post, display url to channel"""
         # download top reddit images for a given subreddit
         reddit_results = await self.fetch(subreddit)
         reddit_results = reddit_results['data']['children']
@@ -38,16 +40,16 @@ class RedditPics:
         # randomly pick a post from the above results
         post = self.get_random_post(reddit_results)
 
-        if post == None:
+        if post is None:
             # if no images were found in the results, exit
             await self.bot.say("No image results found.")
         else:
             # this is where the bot replies with what she found
             await self.bot.say(post)
 
-    # connect to reddit and download the top posts of all time for that subreddit (limit 25)
     # TODO make this function download multiple pages of 25 posts for better result variety
     async def fetch(self, subreddit):
+        """connect to reddit and download the top posts of all time for that subreddit (limit 25)"""
         header = {'User-Agent': 'trying to learn this async thing'}
         url = "https://www.reddit.com/r/{0}/top/.json?sort=top&t=all".format(subreddit)
 
@@ -55,10 +57,10 @@ class RedditPics:
             async with self.session.get(url, headers=header) as response:
                 return await response.json()
 
-    # pick a random post from the results
-    # ensure that post is an image and is SFW
-    # return None if no images found
-    def get_random_post(self, reddit_results: list):
+    @staticmethod
+    def get_random_post(reddit_results: list):
+        """pick a random post from the results, ensure that post is an image and is SFW,
+        return None if no images found"""
         picture_list = []
 
         for item in reddit_results:
@@ -72,4 +74,5 @@ class RedditPics:
 
 
 def setup(bot):
+    """Adds this bot to the cog list."""
     bot.add_cog(RedditPics(bot))
