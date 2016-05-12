@@ -3,8 +3,6 @@ __author__ = 'pico'
 from discord.ext import commands
 import random
 import aiohttp
-import asyncio
-
 
 # reddit pics cog
 class RedditPics:
@@ -25,8 +23,10 @@ class RedditPics:
         else:
             await self.bot.say("Invalid syntax.")
 
+    # download subreddit top results
+    # pick a random post
+    # display url to channel
     async def execute_request(self, subreddit):
-
         # download top reddit images for a given subreddit
         reddit_results = await self.fetch(self.session, subreddit)
         reddit_results = reddit_results['data']['children']
@@ -55,7 +55,8 @@ class RedditPics:
             async with session.get(url, headers=header) as response:
                 return await response.json()
 
-    # pick a random post from the results, ensure that post is an image and is SFW
+    # pick a random post from the results
+    # ensure that post is an image and is SFW
     # return None if no images found
     def get_random_post(self, reddit_results: list):
         picture_list = []
@@ -66,11 +67,11 @@ class RedditPics:
                     continue
                 picture_list.append(item['data']['url'])
 
-        if len(picture_list) == 0:
-            self.bot.say("Could not retrieve a picture from the results.")
-            return None
-        else:
+        try:
             return random.choice(picture_list)
+        except IndexError:
+            return None
+
 
 def setup(bot):
     bot.add_cog(RedditPics(bot))
