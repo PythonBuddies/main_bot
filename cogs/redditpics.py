@@ -47,7 +47,6 @@ class RedditPics:
             # this is where the bot replies with what she found
             await self.bot.say(post)
 
-    # TODO make this function download multiple pages of 25 posts for better result variety
     async def fetch(self, subreddit):
         """connect to reddit and download the top posts of all time for that subreddit (limit 25)"""
         header = {'User-Agent': 'trying to learn this async thing'}
